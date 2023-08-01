@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Route;
            ]
         }
  */
+
 Route::get('/students', function (Request $request) {
     $rawData = DB::select(DB::raw("select id, name, email, phone from students"));
 
@@ -46,8 +47,8 @@ Route::get('/students', function (Request $request) {
 
     $statusCode = 200;
 
-    return response()->json([  
-            'data' => $responseData
+    return response()->json([
+        'data' => $responseData
     ], $statusCode);
 });
 
@@ -73,16 +74,16 @@ Route::get('/students', function (Request $request) {
 Route::post('/students', function (Request $request) {
     $data = $request->input();
     //print_r($data);
-    
-    $id= DB::table('students')->insertGetId([
-        'name'=> $data['name'],
-        'email'=>$data['email'],
-        'phone'=>$data['phone'],
+
+    $id = DB::table('students')->insertGetId([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'phone' => $data['phone'],
     ]);
-    
+
     return response()->json([
-        'data'=>[
-            'id'=>$id,
+        'data' => [
+            'id' => $id,
         ]
     ], 200);
 });
@@ -110,18 +111,25 @@ Route::post('/students', function (Request $request) {
                 }
 */
 
-Route::get('students/{id}', function ($id) {
+Route::get('/students/{id}', function ($id) {
 
-    $rows= DB::select('select * from students where id = ?', [$id]);
-    $student= $rows[0];
-    print_r($student);
+    $rows = DB::select('select * from students where id = ?', [$id]);
+
+    if (count($rows) == 0) {
+        return response()->json([
+            'data' => [],
+        ], 404);
+    }
+
+    $student = $rows[0];
+    //print_r($student);
 
     return response()->json([
-        'data'=>[
-            "id"=> $student->id,
-            "name"=> $student->name,
-            "email"=> $student->email,
-            "phone"=> $student->phone,
+        'data' => [
+            "id" => $student->id,
+            "name" => $student->name,
+            "email" => $student->email,
+            "phone" => $student->phone,
         ]
     ], 200);
 });
@@ -148,8 +156,28 @@ Route::get('students/{id}', function ($id) {
             }
  */
 
+Route::put('/students/{id}', function (Request $request, $id) {
+    $newStudent = $request->input();
 
- /*
+    DB::update(
+        'update students 
+                set name = :name, email= :email, phone= :phone 
+                where id = :id',
+        ['name' => $newStudent['name'], 'email' => $newStudent['email'], 'phone' => $newStudent['phone'], 'id' => $id]
+    );
+
+    return response()->json([
+        'data' => [
+            'id' => $id,
+            'name' => $newStudent['name'],
+            'email' => $newStudent['email'],
+            'phone' => $newStudent['phone'],
+        ]
+    ]);
+});
+
+
+/*
    * TODO: For Courses implement Get, Create & Update endpoints same as students 
    * Get all URL: GET /courses
    * Get course details: GET /courses/{id}
@@ -158,8 +186,80 @@ Route::get('students/{id}', function ($id) {
    * Note: For JSON keys in both the request and response, let's use the same database columns names.
  */
 
+Route::get('/courses', function (Request $request) {
+    $rawData = DB::select(DB::raw("select id, name from courses"));
 
- /*
+    $responseData = [];
+
+    foreach ($rawData as $rd) {
+        array_push($responseData, [
+            'id' => $rd->id,
+            'name' => $rd->name,
+        ]);
+    }
+
+    $statusCode = 200;
+
+    return response()->json([
+        'data' => $responseData
+    ], $statusCode);
+});
+
+Route::post('/courses', function (Request $request) {
+    $data = $request->input();
+    //print_r($data);
+
+    $id = DB::table('courses')->insertGetId([
+        'name' => $data['name'],
+    ]);
+
+    return response()->json([
+        'data' => [
+            'id' => $id,
+        ]
+    ], 200);
+});
+
+Route::get('/courses/{id}', function ($id) {
+
+    $rows = DB::select('select * from courses where id = ?', [$id]);
+
+    if (count($rows) == 0) {
+        return response()->json([
+            'data' => [],
+        ], 404);
+    }
+
+    $student = $rows[0];
+    //print_r($student);
+
+    return response()->json([
+        'data' => [
+            "id" => $student->id,
+            "name" => $student->name,
+        ]
+    ], 200);
+});
+
+Route::put('/courses/{id}', function (Request $request, $id) {
+    $newStudent = $request->input();
+
+    DB::update(
+        'update courses 
+                set name = :name 
+                where id = :id',
+        ['name' => $newStudent['name'], 'id' => $id]
+    );
+
+    return response()->json([
+        'data' => [
+            'id' => $id,
+            'name' => $newStudent['name'],
+        ]
+    ]);
+});
+
+/*
   * TODO: Get all grades endpoint
   * URL: GET /grades
   * Response:
@@ -180,7 +280,25 @@ Route::get('students/{id}', function ($id) {
         }
   */
 
-  /*
+Route::get('/grades', function () {
+    $grades = DB::select('select * from grades');
+
+    $result = [];
+
+    foreach ($grades as $grade) {
+        array_push($result, [
+            "student_id" => $grade->student_id,
+            "course_id" => $grade->course_id,
+            "grade" => $grade->grade
+        ]);
+    }
+
+    return response()->json([
+        'data' => $result,
+    ]);
+});
+
+/*
    * TODO: Get grades for specific student only.
    * URL: GET /students/{student_id}/grades
    * Response:
@@ -201,8 +319,25 @@ Route::get('students/{id}', function ($id) {
         }
   */
 
+Route::get('/students/{student_id}/grades', function ($id) {
+    $grades = DB::select('select * from grades where student_id=?', [$id]);
 
-  /*
+    $result = [];
+
+    foreach ($grades as $grade) {
+        array_push($result, [
+            "student_id" => $grade->student_id,
+            "course_id" => $grade->course_id,
+            "grade" => $grade->grade
+        ]);
+    }
+
+    return response()->json([
+        'data' => $result,
+    ]);
+});
+
+/*
    * TODO: Get specific grade for specific student only. Shall return one record only if exists.
    * URL: GET /students/{student_id}/grades/{grade_id}
    * Response:
@@ -215,3 +350,21 @@ Route::get('students/{id}', function ($id) {
             }
         }
   */
+
+Route::get('/students/{student_id}/grades/{grade_id}', function ($student_id, $grade_id) {
+    $grades = DB::select('select * from grades where student_id=? and id=?', [$student_id, $grade_id]);
+
+    $result = [];
+
+    foreach ($grades as $grade) {
+        array_push($result, [
+            "student_id" => $grade->student_id,
+            "course_id" => $grade->course_id,
+            "grade" => $grade->grade
+        ]);
+    }
+
+    return response()->json([
+        'data' => $result,
+    ]);
+});
