@@ -70,6 +70,22 @@ Route::get('/students', function (Request $request) {
                 }
             }
 */
+Route::post('/students', function (Request $request) {
+    $data = $request->input();
+    //print_r($data);
+    
+    $id= DB::table('students')->insertGetId([
+        'name'=> $data['name'],
+        'email'=>$data['email'],
+        'phone'=>$data['phone'],
+    ]);
+    
+    return response()->json([
+        'data'=>[
+            'id'=>$id,
+        ]
+    ], 200);
+});
 
 /* 
     * TODO: Get student details by id
@@ -93,6 +109,22 @@ Route::get('/students', function (Request $request) {
                     "data": {}
                 }
 */
+
+Route::get('students/{id}', function ($id) {
+
+    $rows= DB::select('select * from students where id = ?', [$id]);
+    $student= $rows[0];
+    print_r($student);
+
+    return response()->json([
+        'data'=>[
+            "id"=> $student->id,
+            "name"=> $student->name,
+            "email"=> $student->email,
+            "phone"=> $student->phone,
+        ]
+    ], 200);
+});
 
 /*
     * TODO: Update student data
