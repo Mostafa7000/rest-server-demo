@@ -354,15 +354,11 @@ Route::get('/students/{student_id}/grades', function ($id) {
 Route::get('/students/{student_id}/grades/{grade_id}', function ($student_id, $grade_id) {
     $grades = DB::select('select * from grades where student_id=? and id=?', [$student_id, $grade_id]);
 
-    $result = [];
-
-    foreach ($grades as $grade) {
-        array_push($result, [
-            "student_id" => $grade->student_id,
-            "course_id" => $grade->course_id,
-            "grade" => $grade->grade
-        ]);
-    }
+    $result = [
+        'student_id' => $grades[0]->student_id,
+        'course_id' => $grades[0]->course_id,
+        'grade' => $grades[0]->grade
+    ];
 
     return response()->json([
         'data' => $result,
