@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-
 
 // FOR SIMPLICITY WE WON'T IMPLEMENT DELETE OPERATIONS.
 
@@ -12,16 +12,16 @@ use Illuminate\Support\Facades\Route;
  * URL: GET /students
  * Response:
      Status code: 200
-     JSON body: 
-         { 
-           "data": [    
-              { 
+     JSON body:
+         {
+           "data": [
+              {
                 "id": "student_id",
                 "name": "student_name",
                 "email": "student_email",
                 "phone": "student_phone"
               },
-              { 
+              {
                 "id": "student_id",
                 "name": "student_name",
                 "email": "student_email",
@@ -37,12 +37,12 @@ Route::get('/students', function (Request $request) {
     $responseData = [];
 
     foreach ($rawData as $rd) {
-        array_push($responseData, [
+        $responseData[] = [
             'id' => $rd->id,
             'name' => $rd->name,
             'email' => $rd->email,
             'phone' => $rd->phone,
-        ]);
+        ];
     }
 
     $statusCode = 200;
@@ -53,20 +53,20 @@ Route::get('/students', function (Request $request) {
 });
 
 
-/* 
+/*
     * TODO: Create new student.
     * URL: POST /students
     * Request Body:
-        {   
+        {
             "name": "student_name",
             "email": "student_email",
             "phone": "student_phone"
         }
     * Response:
         status_code: 200
-        JSON body: 
-            {   
-                "data": {   
+        JSON body:
+            {
+                "data": {
                     "id": "student_id_from_database"
                 }
             }
@@ -88,14 +88,14 @@ Route::post('/students', function (Request $request) {
     ], 200);
 });
 
-/* 
+/*
     * TODO: Get student details by id
     * URL: GET /students/{id}
     * Response:
        * success:
             status_code: 200
-            JSON body: 
-                { 
+            JSON body:
+                {
                     "data": {
                         "id": "student_id",
                         "name": "student_name",
@@ -105,8 +105,8 @@ Route::post('/students', function (Request $request) {
                 }
        * not found:
             status_code: 404
-            JSON body: 
-                {   
+            JSON body:
+                {
                     "data": {}
                 }
 */
@@ -138,7 +138,7 @@ Route::get('/students/{id}', function ($id) {
     * TODO: Update student data
     * URL: PUT /students/{id}
     * Request Body:
-        {   
+        {
             "name": "new_student_name",
             "email": "new_student_email",
             "phone": "new_student_phone"
@@ -146,8 +146,8 @@ Route::get('/students/{id}', function ($id) {
     * Response:
         status_code: 200
         JSON body:
-            {   
-                "data": {   
+            {
+                "data": {
                     "id": "student_id",
                     "name": "new_student_name",
                     "email": "new_student_email",
@@ -160,8 +160,8 @@ Route::put('/students/{id}', function (Request $request, $id) {
     $newStudent = $request->input();
 
     DB::update(
-        'update students 
-                set name = :name, email= :email, phone= :phone 
+        'update students
+                set name = :name, email= :email, phone= :phone
                 where id = :id',
         ['name' => $newStudent['name'], 'email' => $newStudent['email'], 'phone' => $newStudent['phone'], 'id' => $id]
     );
@@ -178,11 +178,11 @@ Route::put('/students/{id}', function (Request $request, $id) {
 
 
 /*
-   * TODO: For Courses implement Get, Create & Update endpoints same as students 
+   * TODO: For Courses implement Get, Create & Update endpoints same as students
    * Get all URL: GET /courses
    * Get course details: GET /courses/{id}
    * Create new course: POST /courses{id}
-   * Update course: PUT /courses/{id} 
+   * Update course: PUT /courses/{id}
    * Note: For JSON keys in both the request and response, let's use the same database columns names.
  */
 
@@ -245,8 +245,8 @@ Route::put('/courses/{id}', function (Request $request, $id) {
     $newStudent = $request->input();
 
     DB::update(
-        'update courses 
-                set name = :name 
+        'update courses
+                set name = :name
                 where id = :id',
         ['name' => $newStudent['name'], 'id' => $id]
     );
@@ -264,14 +264,14 @@ Route::put('/courses/{id}', function (Request $request, $id) {
   * URL: GET /grades
   * Response:
         status_code: 200
-        JSON body: {    
-            "data": [   
-                {   
+        JSON body: {
+            "data": [
+                {
                     "student_id": "STUDENT ID"
                     "course_id": "COURSE ID",
                     "grade": "GRADE"
                 },
-                {   
+                {
                     "student_id": "STUDENT ID"
                     "course_id": "COURSE ID",
                     "grade": "GRADE"
@@ -303,14 +303,14 @@ Route::get('/grades', function () {
    * URL: GET /students/{student_id}/grades
    * Response:
         status_code: 200
-        JSON body: {    
-            "data": [   
-                {   
+        JSON body: {
+            "data": [
+                {
                     "student_id": "STUDENT ID"
                     "course_id": "COURSE ID",
                     "grade": "GRADE"
                 },
-                {   
+                {
                     "student_id": "STUDENT ID"
                     "course_id": "COURSE ID",
                     "grade": "GRADE"
@@ -342,8 +342,8 @@ Route::get('/students/{student_id}/grades', function ($id) {
    * URL: GET /students/{student_id}/grades/{grade_id}
    * Response:
         status_code: 200
-        JSON body: {    
-            "data": {   
+        JSON body: {
+            "data": {
                 "student_id": "STUDENT ID"
                 "course_id": "COURSE ID",
                 "grade": "GRADE"
